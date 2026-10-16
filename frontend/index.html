@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RexStore - Top Up Game All In One</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Firebase App & Auth Compat SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAaV6SbPOWofU4hJalHbxaQUb6kqfeMkyA",
+            authDomain: "rexstore-bc158.firebaseapp.com",
+            projectId: "rexstore-bc158",
+            storageBucket: "rexstore-bc158.firebasestorage.app",
+            messagingSenderId: "894870658565",
+            appId: "1:894870658565:web:7b8bcc6c927078a69b466c",
+            measurementId: "G-LQ5X83XMR1"
+        };
+        firebase.initializeApp(firebaseConfig);
+    </script>
+    <!-- Midtrans Snap JS -->
+    <script type="text/javascript" src="https://app.midtrans.com/snap/snap.js" data-client-key="Mid-client-mEFTyKF-dKrPdE_G"></script>
+    <!-- Firebase Firestore Compat SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script>
+        // Inisialisasi Firestore Database
+        const db = firebase.firestore();
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#ecfeff',
+                            100: '#cffafe',
+                            500: '#06b6d4',
+                            600: '#0891b2',
+                            900: '#164e63',
+                            dark: '#0e1726',
+                            darker: '#090e17',
+                            card: '#162238'
+                        }
+                    },
+                    animation: {
+                        'blob': 'blob 10s infinite alternate',
+                        'lightning': 'lightning 2s infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' }
+                        },
+                        lightning: {
+                            '0%, 100%': { opacity: '1', filter: 'drop-shadow(0 0 12px rgba(6, 182, 212, 1)) drop-shadow(0 0 20px rgba(16, 185, 129, 0.9))' },
+                            '50%': { opacity: '0.4', filter: 'drop-shadow(0 0 2px rgba(6, 182, 212, 0.4))' },
+                            '52%': { opacity: '1', filter: 'drop-shadow(0 0 18px rgba(6, 182, 212, 1)) drop-shadow(0 0 25px rgba(16, 185, 129, 1))' },
+                            '54%': { opacity: '0.6', filter: 'drop-shadow(0 0 6px rgba(16, 185, 129, 0.6))' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Link ke file CSS Eksternal -->
+    <link rel="stylesheet" href="style.css">
+    <style>
+        @keyframes smoothMarquee {
+            0% {
+                transform: translate3d(0, 0, 0);
+            }
+            
+            100% {
+                transform: translate3d(-50%, 0, 0);
+            }
+        }
+        
+        .marquee-track {
+            display: flex;
+            width: max-content;
+            will-change: transform;
+            animation: smoothMarquee 28s linear infinite;
+        }
+        
+        .marquee-track:hover {
+            animation-play-state: paused;
+        }
+        
+        /* Gradasi Cyan-Hijau Menyeluruh untuk Teks & Ikon */
+        .gradient-cyan-green {
+            background: linear-gradient(135deg, #06b6d4, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 12px rgba(6, 182, 212, 0.6));
+        }
+    </style>
+</head>
+
+<body class="font-sans antialiased flex flex-col min-h-screen bg-[#090e17] text-slate-100">
+    <!-- Global Loading Overlay -->
+    <div id="global-loader" class="fixed inset-0 bg-[#090e17]/90 backdrop-blur-md z-[100] flex flex-col items-center justify-center transition-opacity duration-300">
+        <div class="relative mb-4">
+            <i class="fa-solid fa-bolt gradient-cyan-green text-5xl animate-lightning"></i>
+        </div>
+        <div class="text-white font-extrabold text-lg tracking-wider mb-2">REX<span class="gradient-cyan-green">STORE</span></div>
+        <div class="flex items-center space-x-2 text-cyan-300 text-xs font-semibold">
+            <i class="fa-solid fa-circle-notch fa-spin gradient-cyan-green"></i>
+            <span id="loader-text" data-i18n="loaderText">Memuat sistem...</span>
+        </div>
+    </div>
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-40 glass-panel border-b border-slate-800 bg-[#090e17]/90 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo dengan Gradasi Cyan-Hijau -->
+                <div class="flex-shrink-0 flex items-center cursor-pointer group" onclick="showHome()">
+                    <i class="fa-solid fa-bolt gradient-cyan-green text-2xl mr-2 animate-lightning"></i>
+                    <span class="font-extrabold text-xl md:text-2xl tracking-wider text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]">REX<span class="gradient-cyan-green">STORE</span></span>
+                </div>
+                <!-- Auth & Language Buttons (Desktop) -->
+                <div class="hidden md:flex items-center space-x-3">
+                    <button onclick="openVipModal()" class="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-slate-800/95 hover:bg-slate-700 text-xs font-bold text-cyan-300 border border-cyan-500/30 transition cursor-pointer shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+                        <i class="fa-solid fa-crown gradient-cyan-green text-xs"></i>
+                        <span id="desktop-vip-text">VIP 0</span>
+                    </button>
+                    <button onclick="openModal('languageModal')" class="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-slate-800/95 hover:bg-slate-700 text-xs font-bold text-slate-200 border border-slate-700 transition cursor-pointer shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+                        <span id="nav-flag">🇮🇩</span>
+                        <span id="nav-lang-code">ID</span>
+                        <i class="fa-solid fa-chevron-down text-[9px] gradient-cyan-green ml-0.5"></i>
+                    </button>
+                    <div id="auth-guest" class="flex items-center space-x-2">
+                        <button onclick="openModal('loginModal')" data-i18n="login" class="text-sm text-slate-300 hover:text-white transition px-3 py-2 rounded-lg font-medium hover:bg-slate-800">Masuk</button>
+                        <button onclick="openModal('registerModal')" data-i18n="register" class="text-sm bg-gradient-to-r from-cyan-600 to-emerald-500 hover:from-cyan-500 hover:to-emerald-400 text-white px-4 py-2 rounded-lg font-medium transition shadow-lg shadow-cyan-600/30">Daftar</button>
+                    </div>
+                    <div id="auth-user" class="hidden flex items-center space-x-3">
+                        <div onclick="showAccountCenter()" class="flex items-center space-x-2 text-sm font-medium text-slate-200 cursor-pointer p-1.5 rounded-lg hover:bg-slate-800 transition group" title="Pusat Akun">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-600 to-emerald-500 flex items-center justify-center text-white font-bold" id="user-avatar">U</div>
+                            <div class="hidden sm:block text-left">
+                                <span id="user-name" class="block leading-tight">User</span>
+                            </div>
+                        </div>
+                        <button onclick="logout()" class="text-sm text-red-400 hover:text-red-300 transition p-2 rounded-lg hover:bg-red-500/10" title="Keluar">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- Mobile Menu Header -->
+                <div class="flex md:hidden items-center space-x-2.5">
+                    <div id="mobile-vip-badge" onclick="openVipModal()" class="flex items-center space-x-1.5 bg-cyan-500/10 border border-cyan-500/30 px-2.5 py-1 rounded-full cursor-pointer">
+                        <i class="fa-solid fa-crown gradient-cyan-green text-xs"></i>
+                        <span id="mobile-vip-text" class="text-[11px] font-bold text-cyan-300">VIP 0</span>
+                    </div>
+                    <button onclick="openModal('languageModal')" class="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-slate-800/95 hover:bg-slate-700 text-[11px] font-bold text-slate-200 border border-slate-700 transition cursor-pointer shadow-[0_0_12px_rgba(6,182,212,0.15)]">
+                        <span id="mob-flag">🇮🇩</span>
+                        <span id="mob-lang-code">ID</span>
+                    </button>
+                    <button onclick="toggleMobileMenu()" class="w-9 h-9 rounded-xl bg-slate-800/95 border border-slate-700 flex items-center justify-center text-slate-200 hover:bg-slate-700 transition cursor-pointer">
+                        <i id="hamburger-icon" class="fa-solid fa-bars text-sm gradient-cyan-green"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Dropdown Drawer Menu -->
+        <div id="mobile-drawer" class="hidden md:hidden bg-slate-950/95 border-b border-slate-800 px-4 pt-3 pb-5 transition-all duration-300 shadow-2xl">
+            <div class="space-y-3">
+                <div id="mobile-auth-user" class="hidden flex items-center justify-between p-3 bg-slate-900 rounded-xl border border-slate-800">
+                    <div class="flex items-center space-x-3 cursor-pointer" onclick="showAccountCenter(); toggleMobileMenu();">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-cyan-600 to-emerald-500 flex items-center justify-center text-white font-bold text-sm" id="mobile-user-avatar">U</div>
+                        <div>
+                            <span id="mobile-user-name" class="block text-white font-bold text-sm">User</span>
+                            <span class="text-xs gradient-cyan-green" data-i18n="manageAccount">Kelola Akun & Riwayat</span>
+                        </div>
+                    </div>
+                    <button onclick="logout(); toggleMobileMenu();" class="text-red-400 hover:text-red-300 p-2 text-sm">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+                <div id="mobile-auth-guest" class="grid grid-cols-2 gap-2 pt-1">
+                    <button onclick="openModal('loginModal'); toggleMobileMenu();" data-i18n="login" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs border border-slate-700 transition">
+                        Masuk
+                    </button>
+                    <button onclick="openModal('registerModal'); toggleMobileMenu();" data-i18n="register" class="w-full py-2.5 bg-gradient-to-r from-cyan-600 to-emerald-500 hover:from-cyan-500 hover:to-emerald-400 text-white font-bold rounded-xl text-xs transition shadow-md shadow-cyan-600/30">
+                        Daftar
+                    </button>
+                </div>
+                <div class="pt-2 border-t border-slate-800/80 space-y-1">
+                    <a href="javascript:void(0)" onclick="showHome(); toggleMobileMenu();" class="block px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:bg-slate-900 hover:text-cyan-400 transition">
+                        <i class="fa-solid fa-house mr-2 gradient-cyan-green"></i> <span data-i18n="home">Beranda Utama</span>
+                    </a>
+                    <a href="javascript:void(0)" onclick="filterGames('populer'); toggleMobileMenu();" class="block px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:bg-slate-900 hover:text-cyan-400 transition">
+                        <i class="fa-solid fa-fire mr-2 gradient-cyan-green"></i> <span data-i18n="popular">Game Populer</span>
+                    </a>
+                    <a href="javascript:void(0)" onclick="filterGames('voucher'); toggleMobileMenu();" class="block px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:bg-slate-900 hover:text-cyan-400 transition">
+                        <i class="fa-solid fa-ticket mr-2 gradient-cyan-green"></i> <span data-i18n="voucher">Voucher Digital</span>
+                    </a>
+                    <a href="javascript:void(0)" onclick="showPage('cara-pembelian'); toggleMobileMenu();" class="block px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:bg-slate-900 hover:text-cyan-400 transition">
+                        <i class="fa-solid fa-circle-question mr-2 gradient-cyan-green"></i> <span data-i18n="howToBuy">Cara Pembelian</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- Main Content -->
+    <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative">
+        <!-- Home View -->
+        <div id="home-view" class="block animate-fade-in">
+            <div id="banner-container" class="relative w-full mb-5 cursor-pointer group">
+                <div id="banner-card" class="relative w-full rounded-2xl overflow-hidden shadow-2xl border border-slate-700/60 transition-all duration-300 bg-slate-950">
+                    <div class="w-full overflow-hidden relative">
+                        <div id="slider-track" class="flex w-full transition-transform duration-500 ease-out">
+                            <!-- Slide 1: Free Fire -->
+                            <div class="w-full flex-shrink-0 flex-grow-0 basis-full p-5 sm:p-6 md:p-7 flex flex-col justify-between relative overflow-hidden bg-cover bg-center min-h-[175px]" style="background-image: url('images/ff-bg.jpg');">
+                                <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/85 to-slate-950/40"></div>
+                                <div class="relative z-10">
+                                    <div class="inline-flex items-center space-x-2 bg-cyan-950/90 text-cyan-300 border border-cyan-500/40 rounded-full px-3 py-1 mb-2.5">
+                                        <i class="fa-solid fa-fire text-xs gradient-cyan-green"></i>
+                                        <span class="text-[10px] font-bold tracking-wider uppercase" data-i18n="slide1Tag">BOOYAH PASS SEASON</span>
+                                    </div>
+                                    <h1 class="text-base sm:text-lg md:text-xl font-extrabold text-white mb-1.5" data-i18n="slide1Title">Free Fire Booyah Pass Top Up</h1>
+                                    <p class="text-slate-300 text-xs sm:text-sm max-w-lg mb-4" data-i18n="slide1Desc">Buka bundle eksklusif & senjata legendaris dengan harga terjangkau instan masuk!</p>
+                                </div>
+                                <div class="relative z-10 flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <button onclick="openTopUp('ff'); event.stopPropagation();" class="bg-gradient-to-r from-cyan-600 to-emerald-500 hover:from-cyan-500 hover:to-emerald-400 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition shadow-[0_0_15px_rgba(6,182,212,0.4)] flex items-center gap-2 cursor-pointer">
+                                            <i class="fa-solid fa-gamepad"></i> <span data-i18n="slide1Btn">Top Up Free Fire</span>
+                                        </button>
+                                        <span class="bg-slate-900/90 text-cyan-400 border border-cyan-500/30 text-[10px] font-bold px-3 py-2 rounded-xl" data-i18n="bestSeller">TERLARIS</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Slide 2: Mobile Legends -->
+                            <div class="w-full flex-shrink-0 flex-grow-0 basis-full p-5 sm:p-6 md:p-7 flex flex-col justify-between relative overflow-hidden bg-cover bg-center min-h-[175px]" style="background-image: url('images/ml-bg.jpg');">
+                                <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/85 to-slate-950/40"></div>
+                                <div class="relative z-10">
+                                    <div class="inline-flex items-center space-x-2 bg-cyan-950/90 text-cyan-300 border border-cyan-500/40 rounded-full px-3 py-1 mb-2.5">
+                                        <i class="fa-solid fa-bolt text-xs gradient-cyan-green"></i>
+                                        <span class="text-[10px] font-bold tracking-wider uppercase" data-i18n="slide2Tag">PROMO KILAT MLBB</span>
+                                    </div>
+                                    <h1 class="text-base sm:text-lg md:text-xl font-extrabold text-white mb-1.5" data-i18n="slide2Title">Mobile Legends Diamond Pass</h1>
+                                    <p class="text-slate-300 text-xs sm:text-sm max-w-lg mb-4" data-i18n="slide2Desc">Dapatkan Weekly Diamond Pass dan Starlight termurah dengan proses otomatis.</p>
+                                </div>
+                                <div class="relative z-10 flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <button onclick="openTopUp('mlbb'); event.stopPropagation();" class="bg-gradient-to-r from-cyan-600 to-emerald-500 hover:from-cyan-500 hover:to-emerald-400 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition shadow-[0_0_15px_rgba(6,182,212,0.4)] flex items-center gap-2 cursor-pointer">
+                                            <i class="fa-solid fa-bolt"></i> <span data-i18n="slide2Btn">Top Up MLBB</span>
+                                        </button>
+                                        <span class="bg-slate-900/90 text-cyan-400 border border-cyan-500/30 text-[10px] font-bold px-3 py-2 rounded-xl" data-i18n="promo">PROMO</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Slide 3: PUBG Mobile -->
+                            <div class="w-full flex-shrink-0 flex-grow-0 basis-full p-5 sm:p-6 md:p-7 flex flex-col justify-between relative overflow-hidden bg-cover bg-center min-h-[175px]" style="background-image: url('images/pubg-bg.jpg');">
+                                <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/85 to-slate-950/40"></div>
+                                <div class="relative z-10">
+                                    <div class="inline-flex items-center space-x-2 bg-cyan-950/90 text-cyan-300 border border-cyan-500/40 rounded-full px-3 py-1 mb-2.5">
+                                        <i class="fa-solid fa-shield-halved text-xs gradient-cyan-green"></i>
+                                        <span class="text-[10px] font-bold tracking-wider uppercase" data-i18n="slide3Tag">DIJAMIN AMAN & LEGAL</span>
+                                    </div>
+                                    <h1 class="text-base sm:text-lg md:text-xl font-extrabold text-white mb-1.5" data-i18n="slide3Title">PUBG Mobile UC & Royale Pass</h1>
+                                    <p class="text-slate-300 text-xs sm:text-sm max-w-lg mb-4" data-i18n="slide3Desc">Top up UC aman resmi langsung masuk ke akun game kamu dalam hitungan detik.</p>
+                                </div>
+                                <div class="relative z-10 flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <button onclick="openTopUp('pubgm'); event.stopPropagation();" class="bg-gradient-to-r from-cyan-600 to-emerald-500 hover:from-cyan-500 hover:to-emerald-400 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition shadow-[0_0_15px_rgba(6,182,212,0.4)] flex items-center gap-2 cursor-pointer">
+                                            <i class="fa-solid fa-coins"></i> <span data-i18n="slide3Btn">Top Up PUBG</span>
+                                        </button>
+                                        <span class="bg-slate-900/90 text-cyan-400 border border-cyan-500/30 text-[10px] font-bold px-3 py-2 rounded-xl" data-i18n="safe100">AMAN 100%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- NAVIGASI & DOTS -->
+                    <div class="relative z-10 flex items-center justify-between px-5 py-3 bg-slate-950/70 border-t border-slate-800/80 backdrop-blur-md">
+                        <div class="flex items-center space-x-2" id="slider-dots-container">
+                            <button onclick="goToSlide(0, event)" class="slider-dot w-6 h-1.5 rounded-full bg-cyan-400 transition-all duration-300"></button>
+                            <button onclick="goToSlide(1, event)" class="slider-dot w-1.5 h-1.5 rounded-full bg-slate-600 hover:bg-slate-400 transition-all duration-300"></button>
+                            <button onclick="goToSlide(2, event)" class="slider-dot w-1.5 h-1.5 rounded-full bg-slate-600 hover:bg-slate-400 transition-all duration-300"></button>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="changeBannerSlide('prev')" class="w-8 h-8 rounded-full bg-slate-900 hover:bg-slate-800 text-slate-300 flex items-center justify-center border border-slate-700 transition cursor-pointer">
+                                <i class="fa-solid fa-chevron-left text-xs"></i>
+                            </button>
+                            <button onclick="changeBannerSlide('next')" class="w-8 h-8 rounded-full bg-slate-900 hover:bg-slate-800 text-slate-300 flex items-center justify-center border border-slate-700 transition cursor-pointer">
+                                <i class="fa-solid fa-chevron-right text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full mb-6 glass-panel rounded-xl px-4 py-2 flex items-center justify-between border border-cyan-500/30 bg-slate-900/60 shadow-md">
+                <div class="flex items-center space-x-2.5 shrink-0">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                    </span>
+                    <span class="text-[11px] font-bold text-cyan-300 tracking-wider uppercase flex items-center">
+                        <i class="fa-solid fa-bolt mr-1 gradient-cyan-green"></i> <span data-i18n="liveTrx">Live Transaksi</span>
+                    </span>
+                </div>
+                <div class="overflow-hidden h-6 flex items-center flex-1 ml-4 relative">
+                    <div id="live-ticker-text" class="text-xs text-slate-300 font-medium truncate w-full ticker-animate" data-i18n="loadingTicker">
+                        Memuat aktivitas transaksi terbaru...
+                    </div>
+                </div>
+                <div class="hidden sm:flex items-center space-x-1 text-[10px] text-slate-400 pl-3 border-l border-slate-800 shrink-0">
+                    <i class="fa-solid fa-shield-check gradient-cyan-green"></i>
+                    <span data-i18n="safe100Percent">100% Aman</span>
+                </div>
+            </div>
+            <div class="block md:hidden w-full mb-4">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-search text-slate-400 text-xs"></i>
+                    </div>
+                    <input type="text" oninput="handleSearch(this.value)" class="block w-full pl-10 pr-4 py-2.5 border border-slate-700/80 rounded-xl leading-5 bg-slate-900 text-slate-200 placeholder-slate-400 text-xs focus:outline-none focus:border-cyan-400 transition-all shadow-inner" placeholder="Cari game favoritmu...">
+                </div>
+            </div>
+            <div class="flex space-x-2 overflow-x-auto hide-scrollbar mb-6 pb-1 border-b border-slate-800" id="category-tabs">
+                <button onclick="filterGames('all')" class="category-btn whitespace-nowrap px-4 py-2 rounded-full text-xs md:text-sm font-bold border border-cyan-400 bg-cyan-500/10 text-cyan-400 transition-all flex items-center gap-1.5 shadow-[0_0_12px_rgba(6,182,212,0.25)]" data-category="all">
+                    <i class="fa-solid fa-gamepad"></i> <span data-i18n="allGames">All Games</span>
+                </button>
+                <button onclick="filterGames('populer')" class="category-btn whitespace-nowrap px-4 py-2 rounded-full text-xs md:text-sm font-bold border border-slate-800 text-slate-400 hover:border-slate-700 hover:text-white transition-all flex items-center gap-1.5" data-category="populer">
+                    <i class="fa-solid fa-fire"></i> <span data-i18n="popular">Populer</span>
+                </button>
+                <button onclick="filterGames('pc')" class="category-btn whitespace-nowrap px-4 py-2 rounded-full text-xs md:text-sm font-bold border border-slate-800 text-slate-400 hover:border-slate-700 hover:text-white transition-all flex items-center gap-1.5" data-category="pc">
+                    <i class="fa-solid fa-computer"></i> <span data-i18n="pcGame">PC</span>
+                </button>
+                <button onclick="filterGames('new')" class="category-btn whitespace-nowrap px-4 py-2 rounded-full text-xs md:text-sm font-bold border border-slate-800 text-slate-400 hover:border-slate-700 hover:text-white transition-all relative flex items-center gap-1.5" data-category="new">
+                    <i class="fa-solid fa-bolt text-cyan-300"></i> <span data-i18n="newGame">New</span>
+                    <span class="absolute -top-1 -right-1 flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                    </span>
+                </button>
+                <button onclick="filterGames('voucher')" class="category-btn whitespace-nowrap px-4 py-2 rounded-full text-xs md:text-sm font-bold border border-slate-800 text-slate-400 hover:border-slate-700 hover:text-white transition-all flex items-center gap-1.5" data-category="voucher">
+                    <i class="fa-solid fa-ticket"></i> <span data-i18n="voucher">Voucher</span>
+                </button>
+            </div>
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg md:text-xl font-bold text-white flex items-center" id="grid-title">
+                    <i class="fa-solid fa-gamepad gradient-cyan-green mr-2"></i> <span data-i18n="allGames">Semua Game</span>
+                </h2>
+            </div>
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 md:gap-4 mb-10" id="game-grid"></div>
+        </div>
+        <!-- Account Center View -->
+        <div id="account-view" class="hidden animate-fade-in space-y-6">
+            <div class="flex items-center text-sm text-slate-400 mb-6 cursor-pointer hover:text-white w-fit bg-slate-800/60 px-3.5 py-1.5 rounded-lg border border-slate-700/50 transition-colors" onclick="showHome()">
+                <i class="fa-solid fa-arrow-left mr-2"></i> <span data-i18n="backHome">Kembali ke Beranda</span>
+            </div>
+            <div class="glass-panel rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-cyan-950/30 to-slate-900 border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
+                <div class="flex items-center space-x-4 w-full">
+                    <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-cyan-600 to-emerald-500 flex items-center justify-center text-white text-3xl font-extrabold shadow-[0_0_25px_rgba(6,182,212,0.6)] shrink-0 overflow-hidden" id="acc-avatar">U</div>
+                    <div>
+                        <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+                            <h1 class="text-2xl font-bold text-white" id="acc-name">Nama User</h1>
+                            <span id="acc-vip-badge" class="text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 px-2.5 py-0.5 rounded-full font-bold">VIP 0</span>
+                        </div>
+                        <p class="text-slate-400 text-sm mt-1" id="acc-email">email@domain.com</p>
+                        <div class="mt-2 text-xs text-slate-300 flex flex-wrap gap-1">
+                            <span data-i18n="totalSpend">Total Belanja:</span> <strong id="acc-total-spend" class="text-white">Rp 0</strong>
+                            <span id="vip-progress-info" class="text-slate-400 ml-1" data-i18n="vipProgress">(Menuju VIP berikutnya)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto shrink-0">
+                    <button onclick="openEditProfileModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-user-pen"></i> Edit Profil
+                    </button>
+                    <button onclick="logout()" class="px-4 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold border border-red-500/30 transition flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-right-from-bracket"></i> Keluar Akun
+                    </button>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass-panel rounded-xl p-6 border border-slate-800 flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-xl bg-cyan-600/20 text-cyan-400 flex items-center justify-center text-xl font-bold shrink-0"><i class="fa-solid fa-receipt"></i></div>
+                    <div>
+                        <p class="text-slate-400 text-xs" data-i18n="totalTrx">Total Transaksi</p>
+                        <h3 class="text-xl font-bold text-white" id="acc-trx-count">0 Pesanan</h3>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-xl p-6 border border-slate-800 flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-xl bg-teal-600/20 text-teal-400 flex items-center justify-center text-xl font-bold shrink-0"><i class="fa-solid fa-wallet"></i></div>
+                    <div>
+                        <p class="text-slate-400 text-xs">Saldo RexCoin</p>
+                        <h3 class="text-xl font-bold text-white coke-balance-text">Rp 0</h3>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-xl p-6 border border-slate-800 flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-xl bg-cyan-600/20 text-cyan-400 flex items-center justify-center text-xl font-bold shrink-0"><i class="fa-solid fa-crown"></i></div>
+                    <div>
+                        <p class="text-slate-400 text-xs" data-i18n="vipBenefit">Keuntungan VIP</p>
+                        <h3 class="text-xl font-bold text-cyan-300" id="acc-vip-benefit">0% Potongan Harga</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="glass-panel rounded-xl p-6 border border-slate-800">
+                <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+                    <i class="fa-solid fa-clock-rotate-left gradient-cyan-green mr-2"></i>
+                    <span data-i18n="recentTrx">Riwayat Transaksi Terakhir</span>
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-300">
+                        <thead class="bg-slate-900/80 text-xs uppercase text-slate-400 border-b border-slate-800">
+                            <tr>
+                                <th class="px-4 py-3" data-i18n="thTrxId">ID Pesanan</th>
+                                <th class="px-4 py-3" data-i18n="thItem">Item</th>
+                                <th class="px-4 py-3" data-i18n="thTotal">Total</th>
+                                <th class="px-4 py-3" data-i18n="thStatus">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="acc-trx-list" class="divide-y divide-slate-800">
+                            <tr>
+                                <td colspan="4" class="px-4 py-6 text-center text-slate-500" data-i18n="noTrx">Belum ada riwayat transaksi</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- Top Up Detail View -->
+        <div id="topup-view" class="hidden animate-fade-in">
+            <div class="flex items-center text-sm text-slate-400 mb-6 cursor-pointer hover:text-white w-fit bg-slate-800/60 px-3.5 py-1.5 rounded-lg border border-slate-700/50 transition-colors" onclick="showHome()">
+                <i class="fa-solid fa-arrow-left mr-2"></i> <span data-i18n="backHome">Kembali ke Beranda</span>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-1">
+                    <div class="glass-panel rounded-xl p-5 sticky top-20 text-center">
+                        <div class="w-24 h-24 mx-auto mb-3 rounded-xl overflow-hidden shadow-md border border-slate-700">
+                            <img id="detail-game-img" src="" alt="Game" class="w-full h-full object-cover">
+                        </div>
+                        <h1 id="detail-game-title" class="text-xl font-bold text-white mb-1">Game Title</h1>
+                        <p id="detail-game-pub" class="text-cyan-400 text-xs mb-4 font-medium uppercase tracking-wider">Publisher</p>
+                        <div class="text-xs text-slate-300 bg-slate-900/70 border border-slate-800 p-4 rounded-lg text-left leading-relaxed">
+                            <p class="font-semibold text-white mb-2 flex items-center"><i class="fa-solid fa-circle-exclamation gradient-cyan-green mr-1.5"></i> <span data-i18n="importantNote">Catatan Penting:</span></p>
+                            <p class="text-slate-400" data-i18n="noteDesc">Top up diproses instan otomatis setelah pembayaran terkonfirmasi. Pastikan ID akun sudah benar.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="glass-panel rounded-xl p-5 border-l-4 border-l-cyan-400 bg-slate-900 shadow-[0_0_15px_rgba(6,182,212,0.1)]">
+                        <div class="flex items-center mb-4">
+                            <span class="w-7 h-7 rounded-full bg-gradient-to-r from-cyan-600 to-emerald-500 text-white font-bold text-xs flex items-center justify-center mr-2.5 shadow-[0_0_10px_rgba(6,182,212,0.5)]">1</span>
+                            <h3 class="text-base font-bold text-white" data-i18n="step1Title">Masukkan Data Akun</h3>
+                        </div>
+                        <div id="account-inputs" class="w-full flex flex-col"></div>
+                    </div>
+                    <div class="glass-panel rounded-xl p-5 border-l-4 border-l-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <span class="w-7 h-7 rounded-full bg-gradient-to-r from-cyan-600 to-emerald-500 text-white font-bold text-xs flex items-center justify-center mr-2.5 shadow-[0_0_10px_rgba(6,182,212,0.5)]">2</span>
+                                <h3 class="text-base font-bold text-white" data-i18n="step2Title">Pilih Nominal</h3>
+                            </div>
+                            <span id="vip-discount-banner" class="text-xs font-semibold text-cyan-300 bg-cyan-500/10 px-2.5 py-1 rounded-full border border-cyan-500/30" data-i18n="vipDiscountActive">VIP Diskon Aktif</span>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="denomination-grid"></div>
+                    </div>
+                    <div class="glass-panel rounded-xl p-5 border-l-4 border-l-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]">
+                        <div class="flex items-center mb-4">
+                            <span class="w-7 h-7 rounded-full bg-gradient-to-r from-cyan-600 to-emerald-500 text-white font-bold text-xs flex items-center justify-center mr-2.5 shadow-[0_0_10px_rgba(6,182,212,0.5)]">3</span>
+                            <h3 class="text-base font-bold text-white" data-i18n="step3Title">Pilih Pembayaran</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <p class="text-xs font-semibold text-white mb-2 uppercase tracking-wider" data-i18n="payEwallet">E-Wallet & QRIS</p>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="payment-ewallet"></div>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-white mb-2 uppercase tracking-wider" data-i18n="payVa">Virtual Account Bank</p>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="payment-va"></div>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-white mb-2 uppercase tracking-wider" data-i18n="payRetail">Gerai Retail / Minimarket</p>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="payment-retail"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900 rounded-xl p-5 flex flex-col sm:flex-row justify-between items-center border border-cyan-500/40">
+                        <div class="mb-3 sm:mb-0 w-full sm:w-auto text-center sm:text-left">
+                            <p class="text-xs text-slate-400">Total Pembayaran (Termasuk Fee)</p>
+                            <p class="text-2xl font-bold text-white tracking-tight" id="total-price">Rp 0</p>
+                        </div>
+                        <button id="checkout-btn" onclick="processCheckout()" class="w-full sm:w-auto bg-gradient-to-r from-cyan-600 to-emerald-500 hover:from-cyan-500 hover:to-emerald-400 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg">
+                            <i class="fa-solid fa-cart-shopping mr-2"></i> Beli Sekarang
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- HUBUNGI KAMI VIEW -->
+        <div id="hubungi-kami-view" class="view-section hidden animate-fade-in max-w-2xl mx-auto py-2">
+            <button onclick="showHome()" class="mb-5 px-4 py-2 bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/60 rounded-xl text-xs font-medium transition flex items-center gap-2 backdrop-blur-md shadow-sm cursor-pointer">
+                <i class="fa-solid fa-arrow-left text-cyan-400"></i> Kembali ke Beranda
+            </button>
+            <div class="glass-panel rounded-2xl p-5 md:p-7 shadow-2xl relative overflow-hidden border border-slate-800">
+                <div class="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="mb-5">
+                    <h1 class="text-xl md:text-2xl font-bold text-white tracking-wide flex items-center gap-2.5">
+                        <i class="fa-solid fa-headset text-cyan-400 drop-shadow-[0_0_10px_rgba(6,182,212,0.8)]"></i> Hubungi Kami
+                    </h1>
+                    <p class="text-xs md:text-sm text-slate-400 mt-1 leading-relaxed">
+                        Butuh bantuan seputar transaksi, kendala top-up, atau kerja sama? Isi formulir di bawah ini atau hubungi layanan resmi kami.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                    <div class="p-3.5 bg-slate-950/40 border border-slate-800/60 rounded-xl flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                        </div>
+                        <div>
+                            <span class="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider">WhatsApp CS</span>
+                            <a href="https://wa.me/6281234567890" target="_blank" class="text-xs font-medium text-white hover:text-cyan-400 transition">+62 812-3456-7890</a>
+                        </div>
+                    </div>
+                    <div class="p-3.5 bg-slate-950/40 border border-slate-800/60 rounded-xl flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
+                            <i class="fa-solid fa-clock text-xs"></i>
+                        </div>
+                        <div>
+                            <span class="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Jam Operasional</span>
+                            <span class="text-xs font-medium text-slate-300">08:00 - 23:00 WIB</span>
+                        </div>
+                    </div>
+                </div>
+                <form onsubmit="submitContactForm(event)" class="space-y-4 bg-slate-950/50 border border-slate-800/80 rounded-xl p-4 md:p-5">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Nama Lengkap</label>
+                        <input type="text" id="contact-name" placeholder="Masukkan nama Anda" required class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-lg text-white text-xs md:text-sm focus:outline-none focus:border-cyan-400 transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Alamat Email</label>
+                        <input type="email" id="contact-email" placeholder="nama@email.com" required class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-lg text-white text-xs md:text-sm focus:outline-none focus:border-cyan-400 transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Pesan / Kendala</label>
+                        <textarea id="contact-message" rows="3" placeholder="Jelaskan detail pertanyaan atau kendala transaksi Anda..." required class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-lg text-white text-xs md:text-sm focus:outline-none focus:border-cyan-400 transition resize-none"></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-cyan-600 to-emerald-500 hover:from-cyan-500 hover:to-emerald-400 text-white font-bold rounded-xl text-xs md:text-sm transition shadow-[0_0_15px_rgba(6,182,212,0.4)] flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-paper-plane"></i> Kirim Pesan
+                    </button>
+                </form>
+            </div>
+        </div>
+        <!-- Static Pages View -->
+        <div id="static-page-view" class="hidden animate-fade-in glass-panel rounded-xl p-6 md:p-8 min-h-[50vh]">
+            <div class="flex items-center text-sm text-slate-400 mb-6 cursor-pointer hover:text-white w-fit bg-slate-800/60 px-3.5 py-1.5 rounded-lg transition-colors" onclick="showHome()">
+                <i class="fa-solid fa-arrow-left mr-2"></i> <span data-i18n="backHome">Kembali ke Beranda</span>
+            </div>
+            <h1 id="static-title" class="text-2xl md:text-3xl font-bold text-white mb-6 pb-3 border-b border-slate-800">Judul</h1>
+            <div id="static-content" class="text-slate-300 text-sm md:text-base leading-relaxed space-y-4"></div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-[#05080e] border-t border-slate-800/80 mt-16 pt-12 pb-8 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Grid Utama Footer (3 Kolom agar seimbang) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
+                <!-- Kolom 1: Tentang -->
+                <div class="space-y-4">
+                    <div class="flex items-center cursor-pointer" onclick="showHome()">
+                        <i class="fa-solid fa-bolt gradient-cyan-green text-2xl mr-2 animate-lightning"></i>
+                        <span class="font-extrabold text-xl tracking-wider text-white">REX<span class="gradient-cyan-green">STORE</span></span>
+                    </div>
+                    <p class="text-slate-400 text-xs leading-relaxed max-w-xs" data-i18n="footerDesc">
+                        Platform top-up game online tercepat, paling murah, dan 100% aman terpercaya di Indonesia. Layanan transaksi otomatis 24/7.
+                    </p>
+                </div>
+                <!-- Kolom 2: Navigasi -->
+                <div>
+                    <h4 class="text-white font-bold mb-4 text-xs tracking-wider uppercase flex items-center">
+                        <i class="fa-solid fa-compass gradient-cyan-green mr-2 text-xs"></i> <span data-i18n="navTitle">Navigasi</span>
+                    </h4>
+                    <ul class="space-y-2.5 text-xs text-slate-400">
+                        <li><a href="javascript:void(0)" onclick="showHome()" class="hover:text-cyan-400 transition-colors flex items-center"><i class="fa-solid fa-chevron-right text-[9px] text-cyan-500 mr-2"></i> <span data-i18n="home">Beranda Utama</span></a></li>
+                        <li><a href="javascript:void(0)" onclick="filterGames('populer')" class="hover:text-cyan-400 transition-colors flex items-center"><i class="fa-solid fa-chevron-right text-[9px] text-cyan-500 mr-2"></i> <span data-i18n="popular">Game Populer</span></a></li>
+                        <li><a href="javascript:void(0)" onclick="filterGames('voucher')" class="hover:text-cyan-400 transition-colors flex items-center"><i class="fa-solid fa-chevron-right text-[9px] text-cyan-500 mr-2"></i> <span data-i18n="voucher">Voucher Digital</span></a></li>
+                        <li><a href="javascript:void(0)" onclick="showAccountCenter()" class="hover:text-cyan-400 transition-colors flex items-center"><i class="fa-solid fa-chevron-right text-[9px] text-cyan-500 mr-2"></i> <span data-i18n="accountVip">Pusat Akun & VIP</span></a></li>
+                    </ul>
+                </div>
+                <!-- Kolom 3: Informasi -->
+                <div>
+                    <h4 class="text-white font-bold mb-4 text-xs tracking-wider uppercase flex items-center">
+                        <i class="fa-solid fa-circle-info gradient-cyan-green mr-2 text-xs"></i> <span data-i18n="infoTitle">Informasi</span>
+                    </h4>
+                    <ul class="space-y-2.5 text-xs text-slate-400">
+                        <li><a href="javascript:void(0)" onclick="showPage('cara-pembelian')" class="hover:text-cyan-400 transition-colors flex items-center"><i class="fa-solid fa-chevron-right text-[9px] text-cyan-500 mr-2"></i> <span data-i18n="howToBuy">Cara Pembelian</span></a></li>
+                        <li><a href="javascript:void(0)" onclick="showPage('syarat-ketentuan')" class="hover:text-cyan-400 transition-colors flex items-center"><i class="fa-solid fa-chevron-right text-[9px] text-cyan-500 mr-2"></i> <span data-i18n="terms">Syarat & Ketentuan</span></a></li>
+                        <li><a href="javascript:void(0)" onclick="showPage('kebijakan-privasi')" class="hover:text-cyan-400 transition-colors flex items-center"><i class="fa-solid fa-chevron-right text-[9px] text-cyan-500 mr-2"></i> <span data-i18n="privacy">Kebijakan Privasi</span></a></li>
+                        <li><a href="javascript:void(0)" onclick="showPage('hubungi-kami')" class="hover:text-cyan-400 transition-colors flex items-center"><i class="fa-solid fa-chevron-right text-[9px] text-cyan-500 mr-2"></i> <span data-i18n="helpCs">Hubungi Kami</span></a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Baris Penuh (Full Width) Metode Pembayaran Terlengkap Agar Responsif Sempurna di Desktop & Mobile -->
+            <div class="w-full bg-gradient-to-r from-cyan-950/80 via-[#0d2a33]/90 to-emerald-950/80 border border-cyan-500/20 py-8 px-4 sm:px-8 rounded-2xl text-center text-white mb-8 shadow-xl overflow-hidden relative">
+                <h4 class="text-xl sm:text-2xl font-bold mb-2 tracking-wide text-white drop-shadow-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-wallet text-cyan-400 text-lg"></i> <span>Metode Pembayaran</span>
+                </h4>
+                <p class="text-xs sm:text-sm text-cyan-100/80 max-w-2xl mx-auto leading-relaxed mb-6 px-2 font-normal">
+                    Kami mendukung berbagai metode pembayaran, termasuk QRIS, e-wallet, virtual account, transfer bank, ATM Bersama, dan minimarket.
+                </p>
+                
+                <!-- Slider Marquee Logo Pembayaran -->
+                <div class="relative w-full overflow-hidden flex items-center py-2">
+                    <div class="marquee-track flex items-center space-x-10 sm:space-x-14 opacity-90 hover:opacity-100 transition-opacity">
+                        <!-- SET LOGO 1 -->
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS" class="h-6 sm:h-7 object-contain shrink-0 brightness-200">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/ShopeePay_logo.svg" alt="ShopeePay" class="h-5 sm:h-6 object-contain shrink-0 brightness-200">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO" class="h-5 sm:h-6 object-contain shrink-0 brightness-200">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay" class="h-5 sm:h-6 object-contain shrink-0 brightness-200">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA" class="h-5 sm:h-6 object-contain shrink-0 brightness-200">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/BANK_BRI_logo.svg" alt="Bank BRI" class="h-5 sm:h-6 object-contain shrink-0 brightness-200">
+                        <img src="https://upload.wikimedia.org/wikipedia/id/5/55/BNI_logo.svg" alt="BNI" class="h-4 sm:h-5 object-contain shrink-0 brightness-200">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg" alt="Mandiri" class="h-5 sm:h-6 object-contain shrink-0 brightness-200">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c5/CIMB_Niaga_logo.svg" alt="CIMB Niaga" class="h-5 sm:h-6 object-contain shrink-0 brightness-200">
+                        
+                        <!-- SET LOGO 2 (DUPLIKAT UNTUK INFINITE LOOP) -->
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS" class="h-6 sm:h-7 object-contain shrink-0 brightness-200">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/ShopeePay_logo.svg" alt="ShopeePay" class="h-5 sm:h-6 object-contain shrink-0 brightness-200">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO" class="h-5 sm:h-6 object-contain shrink-0 brightness-200">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay" class="h-5 sm:h-6 object-contain shrink-0 brightness-200">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA" class="h-5 sm:h-6 object-contain shrink-0 brightness-200">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/BANK_BRI_logo.svg" alt="Bank BRI" class="h-5 sm:h-6 object-contain shrink-0 brightness-200">
+                        <img src="https://upload.wikimedia.org/wikipedia/id/5/55/BNI_logo.svg" alt="BNI" class="h-4 sm:h-5 object-contain shrink-0 brightness-200">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg" alt="Mandiri" class="h-5 sm:h-6 object-contain shrink-0 brightness-200">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c5/CIMB_Niaga_logo.svg" alt="CIMB Niaga" class="h-5 sm:h-6 object-contain shrink-0 brightness-200">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Copyright & Sistem -->
+            <div class="border-t border-slate-800/80 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-slate-500">
+                <p>© 2026 RexStore. <span data-i18n="copyright">Hak Cipta Dilindungi.</span></p>
+                <div class="flex items-center space-x-2 bg-slate-900/60 px-3 py-1 rounded-full border border-slate-800">
+                    <span class="text-[11px]" data-i18n="autoSystem">Sistem Transaksi Otomatis 24 Jam</span>
+                    <i class="fa-solid fa-shield-halved gradient-cyan-green text-xs"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Modals -->
+    <div id="modal-overlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 modal" onclick="closeAllModals()"></div>
+    <!-- Modal / Halaman VIP -->
+    <div id="vipModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden">
+        <div class="bg-[#120a1f] border border-slate-800 rounded-3xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 relative text-slate-100">
+            <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-crown text-cyan-400 text-lg"></i>
+                    <h3 class="font-bold text-white text-sm" data-i18n="vipInfoTitle">INFORMASI VIP</h3>
+                </div>
+                <button onclick="closeVipModal()" class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center hover:bg-emerald-500/30 transition cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="bg-gradient-to-r from-cyan-950/70 to-emerald-950/70 border border-cyan-500/40 rounded-2xl p-4 text-center mb-6 shadow-[0_0_20px_rgba(6,182,212,0.15)] relative overflow-hidden">
+                <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-cyan-500/10 rounded-full blur-xl pointer-events-none"></div>
+                <h3 class="text-xs font-bold text-cyan-300 tracking-wider uppercase mb-1" data-i18n="vipBannerTitle">Buka Manfaat VIP Kaya Raya!</h3>
+                <p class="text-[11px] text-slate-300" data-i18n="vipBannerDesc">Belanja Lebih Banyak di RexStore, Buka Lebih Banyak Keistimewaan!</p>
+            </div>
+            <div class="space-y-4 text-xs text-slate-300">
+                <div>
+                    <h3 class="font-bold text-white mb-1 uppercase text-[11px] tracking-wide text-cyan-400" data-i18n="vipLevelTitle">Tingkat VIP</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed" data-i18n="vipLevelDesc">Sistem pertumbuhan keanggotaan RexStore memiliki 9 tingkat dari V1 hingga V9, memberikan hak istimewa dan manfaat yang berbeda untuk anggota di setiap tingkat.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white mb-1 uppercase text-[11px] tracking-wide text-cyan-400" data-i18n="vipUpgradeTitle">Peningkatan Level VIP</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed" data-i18n="vipUpgradeDesc">Level VIP terkait dengan jumlah kumulatif transaksi yang diisi ulang oleh pemain: pengguna dapat meningkatkan level keanggotaan dengan mengisi ulang atau menukarkan RexCoin sesuai kebutuhan.</p>
+                </div>
+                <div class="overflow-hidden rounded-xl border border-slate-800 mt-4">
+                    <table class="w-full text-left border-collapse text-[11px]">
+                        <thead>
+                            <tr class="bg-slate-900 text-slate-400 border-b border-slate-800">
+                                <th class="p-2.5 font-semibold" data-i18n="thTier">Tingkat</th>
+                                <th class="p-2.5 font-semibold text-right" data-i18n="thMinSpend">Minimal Belanja</th>
+                                <th class="p-2.5 font-semibold text-right" data-i18n="thDiscount">Diskon</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60 bg-slate-900/40">
+                            <tr>
+                                <td class="p-2.5 font-bold text-cyan-400">VIP 0</td>
+                                <td class="p-2.5 text-right text-slate-300">Rp 0</td>
+                                <td class="p-2.5 text-right text-emerald-400 font-bold">0%</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-bold text-cyan-400">VIP 1</td>
+                                <td class="p-2.5 text-right text-slate-300">Rp 1.500.000</td>
+                                <td class="p-2.5 text-right text-emerald-400 font-bold">1%</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-bold text-cyan-400">VIP 2</td>
+                                <td class="p-2.5 text-right text-slate-300">Rp 3.500.000</td>
+                                <td class="p-2.5 text-right text-emerald-400 font-bold">2%</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-bold text-cyan-400">VIP 3</td>
+                                <td class="p-2.5 text-right text-slate-300">Rp 7.000.000</td>
+                                <td class="p-2.5 text-right text-emerald-400 font-bold">3%</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-bold text-cyan-400">VIP 4</td>
+                                <td class="p-2.5 text-right text-slate-300">Rp 12.000.000</td>
+                                <td class="p-2.5 text-right text-emerald-400 font-bold">4%</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-bold text-cyan-400">VIP 5</td>
+                                <td class="p-2.5 text-right text-slate-300">Rp 20.000.000</td>
+                                <td class="p-2.5 text-right text-emerald-400 font-bold">5%</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-bold text-cyan-400">VIP 6</td>
+                                <td class="p-2.5 text-right text-slate-300">Rp 35.000.000</td>
+                                <td class="p-2.5 text-right text-emerald-400 font-bold">6%</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-bold text-cyan-400">VIP 7</td>
+                                <td class="p-2.5 text-right text-slate-300">Rp 55.000.000</td>
+                                <td class="p-2.5 text-right text-emerald-400 font-bold">7%</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-bold text-cyan-400">VIP 8</td>
+                                <td class="p-2.5 text-right text-slate-300">Rp 80.000.000</td>
+                                <td class="p-2.5 text-right text-emerald-400 font-bold">8%</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-bold text-cyan-400">VIP 9</td>
+                                <td class="p-2.5 text-right text-slate-300">Rp 120.000.000</td>
+                                <td class="p-2.5 text-right text-emerald-400 font-bold">9%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Login -->
+    <div id="loginModal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm z-50 modal p-4 hidden">
+        <div class="glass-panel bg-slate-900/95 backdrop-blur-md rounded-2xl border border-slate-700/80 shadow-2xl p-6 relative text-slate-100 text-center">
+            <button onclick="closeAllModals()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-base font-bold cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="text-xl font-extrabold text-white mb-6 tracking-wide">Selamat datang kembali!</h2>
+            <div class="space-y-3">
+                <button onclick="handleGoogleLogin()" class="w-full bg-slate-800/95 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl text-xs transition border border-slate-700/80 flex items-center justify-center gap-3 cursor-pointer shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+                    <i class="fa-brands fa-google text-cyan-400 text-base"></i> Lanjut dengan Google
+                </button>
+                <button onclick="handleTwitterLogin()" class="w-full bg-slate-800/95 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl text-xs transition border border-slate-700/80 flex items-center justify-center gap-3 cursor-pointer shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+                    <i class="fa-brands fa-twitter text-cyan-400 text-base"></i> Lanjut dengan Twitter
+                </button>
+                <button onclick="showEmailLoginForm()" class="w-full bg-gradient-to-r from-cyan-600 to-emerald-500 hover:from-cyan-500 hover:to-emerald-400 text-white font-bold py-3 px-4 rounded-xl text-xs transition flex items-center justify-center gap-3 cursor-pointer shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+                    <i class="fa-regular fa-envelope text-white text-base"></i> Masuk dengan Email
+                </button>
+            </div>
+            <div id="email-login-form-container" class="hidden mt-4 pt-4 border-t border-slate-800 text-left">
+                <form onsubmit="handleLogin(event)" class="space-y-3">
+                    <input type="text" id="loginUsername" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-xs focus:outline-none focus:border-cyan-400" placeholder="nama@email.com">
+                    <div class="relative w-full">
+                        <input type="password" id="loginPassword" required placeholder="Masukkan Password" class="w-full px-3.5 py-2.5 pr-10 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-400">
+                        <button type="button" onclick="togglePasswordVisibility('loginPassword', 'eyeIconLogin')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-400 transition cursor-pointer">
+                            <i id="eyeIconLogin" class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    <button type="submit" class="w-full bg-gradient-to-r from-cyan-600 to-emerald-500 hover:from-cyan-500 hover:to-emerald-400 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-md">Masuk Sekarang</button>
+                </form>
+            </div>
+            <div class="mt-6 pt-4 border-t border-slate-800/80 text-xs text-slate-400">
+                Belum memiliki akun? <a href="javascript:void(0)" onclick="openModal('registerModal')" class="text-cyan-400 font-bold hover:underline ml-1">Daftar</a>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Register -->
+    <div id="registerModal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm z-50 modal p-4 hidden">
+        <div class="glass-panel bg-slate-900/95 backdrop-blur-md rounded-2xl border border-slate-700/80 shadow-2xl p-6 relative text-slate-100 text-center">
+            <button onclick="closeAllModals()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-base font-bold cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="text-xl font-extrabold text-white mb-6 tracking-wide">Daftar Akun Baru</h2>
+            <div class="space-y-3">
+                <button onclick="handleGoogleLogin()" class="w-full bg-slate-800/95 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl text-xs transition border border-slate-700/80 flex items-center justify-center gap-3 cursor-pointer shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+                    <i class="fa-brands fa-google text-cyan-400 text-base"></i> Daftar dengan Google
+                </button>
+                <button onclick="handleTwitterLogin()" class="w-full bg-slate-800/95 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl text-xs transition border border-slate-700/80 flex items-center justify-center gap-3 cursor-pointer shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+                    <i class="fa-brands fa-twitter text-cyan-400 text-base"></i> Daftar dengan Twitter
+                </button>
+                <button onclick="showEmailRegisterForm()" class="w-full bg-gradient-to-r from-cyan-600 to-emerald-500 hover:from-cyan-500 hover:to-emerald-400 text-white font-bold py-3 px-4 rounded-xl text-xs transition flex items-center justify-center gap-3 cursor-pointer shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+                    <i class="fa-regular fa-envelope text-white text-base"></i> Daftar dengan Email
+                </button>
+            </div>
+            <div id="email-register-form-container" class="hidden mt-4 pt-4 border-t border-slate-800 text-left">
+                <form onsubmit="handleRegister(event)" class="space-y-3">
+                    <input type="text" id="regName" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-xs focus:outline-none focus:border-cyan-400" placeholder="Nama Anda">
+                    <input type="email" id="regEmail" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-xs focus:outline-none focus:border-cyan-400" placeholder="nama@email.com">
+                    <div class="relative w-full">
+                        <input type="password" id="regPassword" required minlength="6" placeholder="Masukkan Password" class="w-full px-3.5 py-2.5 pr-10 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-400">
+                        <button type="button" onclick="togglePasswordVisibility('regPassword', 'eyeIconReg')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-400 transition cursor-pointer">
+                            <i id="eyeIconReg" class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    <button type="submit" class="w-full bg-gradient-to-r from-cyan-600 to-emerald-500 hover:from-cyan-500 hover:to-emerald-400 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-md">Daftar Sekarang</button>
+                </form>
+            </div>
+            <div class="mt-6 pt-4 border-t border-slate-800/80 text-xs text-slate-400">
+                Sudah memiliki akun? <a href="javascript:void(0)" onclick="openModal('loginModal')" class="text-cyan-400 font-bold hover:underline ml-1">Masuk</a>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Edit Profile -->
+    <div id="editProfileModal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md z-50 modal p-4 hidden">
+        <div class="glass-panel bg-slate-900 rounded-xl border border-slate-800 shadow-2xl p-6 modal-content relative">
+            <button onclick="closeAllModals()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="text-xl font-bold text-white mb-1 text-center" data-i18n="editTitle">Edit Profil Akun</h2>
+            <form onsubmit="handleEditProfile(event)" class="space-y-4 mt-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Nama Lengkap</label>
+                    <input type="text" id="editName" required class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Email</label>
+                    <input type="email" id="editEmail" required class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Foto Profil dari Galeri</label>
+                    <input type="file" id="editAvatarFile" accept="image/*" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-cyan-500/10 file:text-cyan-400 hover:file:bg-cyan-500/20 cursor-pointer">
+                </div>
+                <button type="submit" data-i18n="save" class="w-full bg-gradient-to-r from-cyan-600 to-emerald-500 hover:from-cyan-500 hover:to-emerald-400 text-white font-bold py-2.5 rounded-lg text-sm transition shadow-[0_0_15px_rgba(6,182,212,0.4)]">Simpan Perubahan</button>
+            </form>
+        </div>
+    </div>
+    <!-- Modal Invoice -->
+    <div id="invoiceModal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm z-50 modal p-4 hidden">
+        <div class="bg-slate-900 rounded-xl border border-slate-800 shadow-2xl overflow-hidden modal-content relative">
+            <div class="bg-gradient-to-r from-cyan-600 to-emerald-500 p-6 text-center text-white">
+                <div class="w-14 h-14 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-2 shadow-[0_0_15px_rgba(255,255,255,0.5)]">
+                    <i class="fa-solid fa-check text-2xl text-white"></i>
+                </div>
+                <h3 class="font-bold text-lg" data-i18n="invoiceTitle">Pesanan Berhasil Dibuat</h3>
+            </div>
+            <div class="p-5 space-y-2 text-sm" id="invoice-details"></div>
+            <div class="p-5 border-t border-slate-800 bg-slate-900/50">
+                <button onclick="finishCheckout()" data-i18n="done" class="w-full bg-gradient-to-r from-cyan-600 to-emerald-500 hover:from-cyan-500 hover:to-emerald-400 text-white font-bold py-2.5 rounded-lg text-sm transition shadow-[0_0_15px_rgba(6,182,212,0.4)]">Selesai</button>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Petunjuk -->
+    <div id="petunjukModal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm z-50 modal p-4 hidden">
+        <div class="glass-panel bg-slate-900 rounded-2xl border border-slate-700 shadow-2xl p-5 modal-content relative text-slate-100 max-h-[85vh] overflow-y-auto no-scrollbar">
+            <button onclick="closeAllModals()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-base font-bold cursor-pointer z-10"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="text-base font-bold text-white mb-3" data-i18n="guideTitle">Petunjuk</h3>
+            <div id="petunjuk-img-container" class="w-full h-32 rounded-xl overflow-hidden mb-4 border border-slate-700 bg-slate-950 flex items-center justify-center">
+                <img id="petunjuk-img" src="images/mobile-lagends.png" alt="Panduan" class="w-full h-full object-cover">
+            </div>
+            <div id="petunjuk-content" class="text-xs text-slate-300 space-y-3 leading-relaxed mb-5"></div>
+            <button onclick="closeAllModals()" class="w-full py-3 bg-gradient-to-r from-cyan-500 to-emerald-400 hover:from-cyan-400 hover:to-emerald-300 text-slate-950 text-xs font-extrabold rounded-xl transition cursor-pointer shadow-[0_0_15px_rgba(6,182,212,0.5)]">OK</button>
+        </div>
+    </div>
+    <!-- Modal Pilih Bahasa & Wilayah -->
+    <div id="languageModal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm z-50 modal p-4 hidden">
+        <div class="glass-panel bg-slate-900 rounded-2xl border border-slate-700 shadow-2xl p-5 relative text-slate-100">
+            <button onclick="closeAllModals()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-base font-bold cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="text-base font-bold text-white mb-4 text-center" data-i18n="langModalTitle">Pilih Bahasa & Wilayah</h3>
+            <div class="space-y-3 mb-5">
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1" data-i18n="countryRegion">Negara / Wilayah</label>
+                    <div class="p-3 bg-slate-800/80 border border-slate-700 rounded-xl text-xs font-bold text-white flex items-center justify-between">
+                        <span>🇮🇩 Indonesia</span>
+                        <i class="fa-solid fa-check gradient-cyan-green text-sm"></i>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1" data-i18n="languageLabel">Bahasa</label>
+                    <div class="space-y-2">
+                        <div onclick="setLanguage('id')" id="lang-opt-id" class="p-3 bg-slate-800 border rounded-xl text-xs font-bold flex items-center justify-between cursor-pointer transition border-cyan-400 text-cyan-400 bg-cyan-500/10">
+                            <span>Bahasa Indonesia - ID</span>
+                            <i class="fa-solid fa-circle-check gradient-cyan-green id-check"></i>
+                        </div>
+                        <div onclick="setLanguage('en')" id="lang-opt-en" class="p-3 bg-slate-800 border rounded-xl text-xs font-bold flex items-center justify-between cursor-pointer transition border-slate-700 text-slate-300 hover:border-slate-500">
+                            <span>English - EN</span>
+                            <i class="fa-solid fa-circle-check gradient-cyan-green hidden en-check"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button onclick="closeAllModals()" data-i18n="confirm" class="w-full py-3 bg-gradient-to-r from-cyan-600 to-emerald-500 hover:from-cyan-500 hover:to-emerald-400 text-white text-xs font-extrabold rounded-xl transition cursor-pointer shadow-[0_0_15px_rgba(6,182,212,0.4)]">Konfirmasi</button>
+        </div>
+    </div>
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+    
+    <!-- Tombol Maskot AI -->
+    <div id="ai-assistant-bubble" class="fixed bottom-7 right-4 z-40 flex items-end cursor-pointer group" onclick="openAiChatModal()">
+        <div class="relative">
+            <div class="relative w-14 h-14 rounded-full bg-transparent flex items-center justify-center shadow-2xl overflow-visible">
+                <img src="../public/images/logo-ai/RexAi-1.png" alt="AI Assistant" class="w-20 h-20 object-contain transform group-hover:scale-110 transition duration-300 -translate-y-1">
+            </div>
+            <span class="absolute -top-2 -right-1 flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+            </span>
+        </div>
+    </div>
+    
+    <!-- Modal Chat AI RexStore.gg -->
+    <div id="aiChatModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+        <div class="bg-[#0b0f17] border border-slate-800 rounded-3xl w-full max-w-lg h-[85vh] flex flex-col overflow-hidden shadow-2xl relative">
+            <div class="px-5 py-4 bg-[#0d111a] border-b border-slate-800/80 flex items-center justify-between shrink-0 relative">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center overflow-hidden">
+                        <img src="../public/images/logo-ai/RexAi-2.png" alt="AI Avatar" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white text-sm leading-tight">Ngobrol Dengan AI</h3>
+                        <p class="text-[11px] text-cyan-400 font-semibold">RexStore.gg</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2 relative">
+                    <button onclick="toggleAiSettings()" class="w-9 h-9 rounded-xl bg-[#151b28] hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition cursor-pointer border border-slate-800">
+                        <i class="fa-solid fa-gear text-sm"></i>
+                    </button>
+                    <button onclick="closeAiChatModal()" class="w-9 h-9 rounded-xl bg-emerald-500/80 hover:bg-emerald-500 text-white flex items-center justify-center transition cursor-pointer">
+                        <i class="fa-solid fa-xmark text-base"></i>
+                    </button>
+                    <div id="aiSettingsDropdown" class="hidden absolute right-0 top-11 w-52 bg-[#101622] border border-slate-700/80 rounded-2xl shadow-2xl p-2.5 z-50 text-xs font-medium space-y-1">
+                        <button onclick="handleClearAiChat()" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-red-500/10 text-red-400 flex items-center space-x-2.5 transition cursor-pointer">
+                            <i class="fa-solid fa-trash-can text-sm"></i>
+                            <span>Hapus Percakapan</span>
+                        </button>
+                        <button onclick="changeAiLanguage()" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-cyan-500/10 text-cyan-400 flex items-center space-x-2.5 transition cursor-pointer">
+                            <i class="fa-solid fa-language text-sm"></i>
+                            <span id="aiLangBtnText">Switch to EN (English)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="ai-chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 text-xs text-slate-300">
+                <div class="flex flex-col space-y-3">
+                    <div class="flex items-start space-x-2 pt-1">
+                        <div class="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center overflow-hidden shrink-0 mt-0.5">
+                            <img src="../public/images/logo-ai/RexAi-2.png" alt="AI Avatar" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex flex-col space-y-1 max-w-[85%]">
+                            <span class="text-[10px] text-cyan-400 font-semibold leading-none">AI RexStore.gg</span>
+                            <div class="bg-[#151b28] border border-slate-800/80 px-3.5 py-2.5 rounded-2xl rounded-tl-none leading-snug text-slate-200 whitespace-pre-wrap shadow-sm">Hei! Aku AI RexStore.gg, teman belanja virtual kamu. Aku di sini siap bantu promo, info VIP, dan dukungan. Aku masih tahap Beta, jadi yuk ngobrol denganku biar aku bisa 'naik level'! 🎮</div>
+                        </div>
+                    </div>
+                    <div class="space-y-2 pt-1">
+                        <button onclick="sendQuickPrompt('Siapa AI RexStore.gg?')" class="w-full text-left bg-[#151b28] hover:bg-[#1f283b] border border-slate-800/80 px-3.5 py-2.5 rounded-xl text-slate-200 transition font-medium cursor-pointer text-xs">
+                            Siapa AI RexStore.gg?
+                        </button>
+                        <button onclick="sendQuickPrompt('Bagaimana cara isi ulang di RexStore?')" class="w-full text-left bg-[#151b28] hover:bg-[#1f283b] border border-slate-800/80 px-3.5 py-2.5 rounded-xl text-slate-200 transition font-medium cursor-pointer text-xs">
+                            Bagaimana cara isi ulang di RexStore?
+                        </button>
+                        <button onclick="sendQuickPrompt('Apa itu poin VIP dan RexCoin?')" class="w-full text-left bg-[#151b28] hover:bg-[#1f283b] border border-slate-800/80 px-3.5 py-2.5 rounded-xl text-slate-200 transition font-medium cursor-pointer text-xs">
+                            Apa itu poin VIP dan RexCoin?
+                        </button>
+                        <button onclick="sendQuickPrompt('Silakan cek pesanan saya')" class="w-full text-left bg-[#151b28] hover:bg-[#1f283b] border border-slate-800/80 px-3.5 py-2.5 rounded-xl text-slate-200 transition font-medium cursor-pointer text-xs">
+                            Silakan cek pesanan saya
+                        </button>
+                        <button onclick="sendQuickPrompt('Hubungkan dengan CS')" class="w-full text-left bg-[#151b28] hover:bg-[#1f283b] border border-slate-800/80 px-3.5 py-2.5 border-cyan-500/30 rounded-xl text-cyan-400 font-semibold transition cursor-pointer text-xs flex items-center justify-between">
+                            <span>🎧 Hubungkan dengan CS</span>
+                            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        </button>
+                    </div>
+                    <div id="ai-welcome-time" class="text-[10px] text-slate-500 pt-1"></div>
+                </div>
+            </div>
+            <div class="px-4 py-3 bg-[#080b11] border-t border-slate-800/80 flex items-center justify-between shrink-0">
+                <span class="text-[11px] text-slate-400 font-medium">RexStore.gg AI Dalam pengembangan atau dalam uji</span>
+                <span class="bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-bold px-2 py-0.5 rounded-lg">Beta</span>
+            </div>
+        </div>
+    </div>
+    <script src="script.js?versi_baru"></script>
+</body>
+</html>

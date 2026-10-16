@@ -1,0 +1,317 @@
+{
+  "products": {
+    "ml_recharge1": {
+      "gameId": "mlbb",
+      "name": "100 Diamonds (50 + 50 Recharge Bonus)",
+      "price": 17806
+    },
+    "ml_recharge2": {
+      "gameId": "mlbb",
+      "name": "300 Diamonds (150 + 150 Recharge Bonus)",
+      "price": 53778
+    },
+    "ml_recharge3": {
+      "gameId": "mlbb",
+      "name": "500 Diamonds (250 + 250 Recharge Bonus)",
+      "price": 89750
+    },
+    "ml_recharge4": {
+      "gameId": "mlbb",
+      "name": "1000 Diamonds (500 + 500 Recharge Bonus)",
+      "price": 179679
+    },
+    "ml_1": {
+      "gameId": "mlbb",
+      "name": "5 Diamonds",
+      "price": 1800
+    },
+    "ml_2": {
+      "gameId": "mlbb",
+      "name": "10 Diamonds (9 + 1 Bonus)",
+      "price": 3595
+    },
+    "ml_3": {
+      "gameId": "mlbb",
+      "name": "12 Diamonds (11 + 1 Bonus)",
+      "price": 3961
+    },
+    "ml_5": {
+      "gameId": "mlbb",
+      "name": "28 Diamonds (25 + 3 Bonus)",
+      "price": 9000
+    },
+    "ml_6": {
+      "gameId": "mlbb",
+      "name": "44 Diamonds (40 + 4 Bonus)",
+      "price": 14389
+    },
+    "ml_7": {
+      "gameId": "mlbb",
+      "name": "54 Diamonds (50 + 4 Bonus)",
+      "price": 17983
+    },
+    "ml_8": {
+      "gameId": "mlbb",
+      "name": "59 Diamonds (53 + 6 Bonus)",
+      "price": 19065
+    },
+    "ml_9": {
+      "gameId": "mlbb",
+      "name": "71 Diamonds (64 + 7 Bonus)",
+      "price": 23026
+    },
+    "ml_10": {
+      "gameId": "mlbb",
+      "name": "74 Diamonds (67 + 7 Bonus)",
+      "price": 24456
+    },
+    "ml_11": {
+      "gameId": "mlbb",
+      "name": "85 Diamonds (77 + 8 Bonus)",
+      "price": 27698
+    },
+    "ml_12": {
+      "gameId": "mlbb",
+      "name": "88 Diamonds (80 + 8 Bonus)",
+      "price": 28778
+    },
+    "ml_13": {
+      "gameId": "mlbb",
+      "name": "110 Diamonds (100 + 10 Bonus)",
+      "price": 36333
+    },
+    "ml_14": {
+      "gameId": "mlbb",
+      "name": "113 Diamonds (102 + 11 Bonus)",
+      "price": 36700
+    },
+    "ml_15": {
+      "gameId": "mlbb",
+      "name": "128 Diamonds (117 + 11 Bonus)",
+      "price": 42091
+    },
+    "ml_16": {
+      "gameId": "mlbb",
+      "name": "148 Diamonds (134 + 14 Bonus)",
+      "price": 48208
+    },
+    "ml_17": {
+      "gameId": "mlbb",
+      "name": "170 Diamonds (154 + 16 Bonus)",
+      "price": 55397
+    },
+    "ml_18": {
+      "gameId": "mlbb",
+      "name": "176 Diamonds (160 + 16 Bonus)",
+      "price": 57556
+    },
+    "ml_19": {
+      "gameId": "mlbb",
+      "name": "184 Diamonds (167 + 17 Bonus)",
+      "price": 61139
+    },
+    "ml_20": {
+      "gameId": "mlbb",
+      "name": "222 Diamonds (200 + 22 Bonus)",
+      "price": 72662
+    },
+    "ml_21": {
+      "gameId": "mlbb",
+      "name": "240 Diamonds (217 + 23 Bonus)",
+      "price": 78059
+    },
+    "ml_22": {
+      "gameId": "mlbb",
+      "name": "258 Diamonds (233 + 25 Bonus)",
+      "price": 85613
+    },
+    "ml_23": {
+      "gameId": "mlbb",
+      "name": "277 Diamonds (250 + 27 Bonus)",
+      "price": 91000
+    },
+    "ml_24": {
+      "gameId": "mlbb",
+      "name": "284 Diamonds (257 + 27 Bonus)",
+      "price": 92200
+    },
+    "ml_25": {
+      "gameId": "mlbb",
+      "name": "296 Diamonds (256 + 40 Bonus)",
+      "price": 92380
+    },
+    "ml_26": {
+      "gameId": "mlbb",
+      "name": "301 Diamonds (261 + 40 Bonus)",
+      "price": 93977
+    },
+    "ml_27": {
+      "gameId": "mlbb",
+      "name": "305 Diamonds (276 + 29 Bonus)",
+      "price": 100007
+    },
+    "ml_28": {
+      "gameId": "mlbb",
+      "name": "333 Diamonds (302 + 31 Bonus)",
+      "price": 109000
+    },
+    "ml_29": {
+      "gameId": "mlbb",
+      "name": "346 Diamonds (314 + 32 Bonus)",
+      "price": 113683
+    },
+    "ml_30": {
+      "gameId": "mlbb",
+      "name": "356 Diamonds (322 + 34 Bonus)",
+      "price": 116636
+    },
+    "ml_31": {
+      "gameId": "mlbb",
+      "name": "370 Diamomds (333 + 37 Bonus)",
+      "price": 117277
+    },
+    "ml_32": {
+      "gameId": "mlbb",
+      "name": "384 Diamonds (346 + 38 Bonus)",
+      "price": 120958
+    },
+    "ml_33": {
+      "gameId": "mlbb",
+      "name": "408 Diamonds (367 + 41 Bonus)",
+      "price": 132017
+    },
+    "ml_34": {
+      "gameId": "mlbb",
+      "name": "424 Diamonds (383 + 41 Bonus)",
+      "price": 134271
+    },
+    "ml_35": {
+      "gameId": "mlbb",
+      "name": "452 Diamonds (407 + 45 Bonus)",
+      "price": 146406
+    },
+    "ml_36": {
+      "gameId": "mlbb",
+      "name": "518 Diamonds (467 + 51 Bonus)",
+      "price": 168700
+    },
+    "ml_elite1": {
+      "gameId": "mlbb",
+      "name": "Starlight Pass Member",
+      "price": 149000
+    },
+    "ml_elite2": {
+      "gameId": "mlbb",
+      "name": "Twilight Pass",
+      "price": 135000
+    },
+    "ml_bonus1": {
+      "gameId": "mlbb",
+      "name": "Weekly Diamond Pass",
+      "price": 28000
+    },
+    "ff_1": {
+      "gameId": "ff",
+      "name": "70 Diamonds",
+      "price": 10000
+    },
+    "ff_2": {
+      "gameId": "ff",
+      "name": "140 Diamonds",
+      "price": 20000
+    },
+    "ff_3": {
+      "gameId": "ff",
+      "name": "355 Diamonds",
+      "price": 50000
+    },
+    "ff_4": {
+      "gameId": "ff",
+      "name": "720 Diamonds",
+      "price": 100000
+    },
+    "ff_m1": {
+      "gameId": "ff",
+      "name": "Membership Mingguan",
+      "price": 30000
+    },
+    "ff_m2": {
+      "gameId": "ff",
+      "name": "Membership Bulanan",
+      "price": 75000
+    },
+    "pub_1": {
+      "gameId": "pubgm",
+      "name": "60 UC",
+      "price": 14000
+    },
+    "pub_2": {
+      "gameId": "pubgm",
+      "name": "325 UC + 25 Bonus",
+      "price": 75000
+    },
+    "pub_3": {
+      "gameId": "pubgm",
+      "name": "660 UC + 60 Bonus",
+      "price": 150000
+    },
+    "pub_rp1": {
+      "gameId": "pubgm",
+      "name": "Royale Pass Month 1",
+      "price": 150000
+    },
+    "st_1": {
+      "gameId": "steam",
+      "name": "Steam Wallet Rp 45.000",
+      "price": 48000
+    },
+    "st_2": {
+      "gameId": "steam",
+      "name": "Steam Wallet Rp 90.000",
+      "price": 95000
+    },
+    "st_3": {
+      "gameId": "steam",
+      "name": "Steam Wallet Rp 120.000",
+      "price": 125000
+    },
+    "gp_1": {
+      "gameId": "google-play",
+      "name": "Google Play Rp 20.000",
+      "price": 22000
+    },
+    "gp_2": {
+      "gameId": "google-play",
+      "name": "Google Play Rp 50.000",
+      "price": 53000
+    },
+    "gp_3": {
+      "gameId": "google-play",
+      "name": "Google Play Rp 100.000",
+      "price": 105000
+    }
+  },
+  "fees": {
+    "qris": 0,
+    "gopay": 1000,
+    "dana": 0,
+    "shopeepay": 1000,
+    "bca": 1000,
+    "mandiri": 1000,
+    "bni": 1000,
+    "indomaret": 2500,
+    "alfamart": 2500
+  },
+  "vipDiscounts": {
+    "0": 0,
+    "1": 1,
+    "2": 2,
+    "3": 3,
+    "4": 4,
+    "5": 5,
+    "6": 6,
+    "7": 7,
+    "8": 8,
+    "9": 9
+  }
+}

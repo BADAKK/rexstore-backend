@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin CS - RexStore.gg</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-[#0b0f17] text-slate-200 min-h-screen font-sans">
+    
+    <!-- Top Navigation -->
+    <header class="bg-[#0d111a] border-b border-slate-800/80 px-6 py-4 flex items-center justify-between sticky top-0 z-30">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-r from-cyan-600 to-emerald-500 flex items-center justify-center font-bold text-white shadow-md">
+                R
+            </div>
+            <div>
+                <h1 class="text-base font-bold text-white leading-tight">Dashboard Admin CS</h1>
+                <p class="text-xs text-cyan-400 font-semibold">RexStore.gg Management</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-3">
+            <button onclick="window.location.href='index.html'" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-semibold transition">
+                <i class="fa-solid fa-house mr-1.5"></i> Ke Website Utama
+            </button>
+        </div>
+    </header>
+    
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
+        
+        <!-- Stat Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-[#0d111a] border border-slate-800/80 p-5 rounded-2xl flex items-center justify-between shadow-sm">
+                <div>
+                    <p class="text-xs text-slate-400">Total Tiket CS</p>
+                    <h3 id="totalTickets" class="text-2xl font-bold text-white mt-1">0</h3>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+            </div>
+            <div class="bg-[#0d111a] border border-slate-800/80 p-5 rounded-2xl flex items-center justify-between shadow-sm">
+                <div>
+                    <p class="text-xs text-slate-400">Status Pending</p>
+                    <h3 id="pendingTickets" class="text-2xl font-bold text-amber-400 mt-1">0</h3>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+            </div>
+            <div class="bg-[#0d111a] border border-slate-800/80 p-5 rounded-2xl flex items-center justify-between shadow-sm">
+                <div>
+                    <p class="text-xs text-slate-400">Selesai Ditangani</p>
+                    <h3 id="doneTickets" class="text-2xl font-bold text-emerald-400 mt-1">0</h3>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabel Laporan CS -->
+        <div class="bg-[#0d111a] border border-slate-800/80 rounded-2xl overflow-hidden shadow-sm">
+            <div class="px-6 py-4 border-b border-slate-800/80 flex items-center justify-between flex-wrap gap-3">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-list text-cyan-400"></i> Daftar Laporan Masuk
+                </h2>
+                <button onclick="clearAllReports()" class="text-xs text-red-400 hover:text-red-300 font-medium transition cursor-pointer">
+                    <i class="fa-solid fa-trash mr-1"></i> Bersihkan Semua Data
+                </button>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-slate-300">
+                    <thead class="bg-[#151b28] text-slate-400 font-semibold border-b border-slate-800/80">
+                        <tr>
+                            <th class="px-6 py-3.5">Tanggal & Waktu</th>
+                            <th class="px-6 py-3.5">Nama</th>
+                            <th class="px-6 py-3.5">ID Pesanan</th>
+                            <th class="px-6 py-3.5">Email</th>
+                            <th class="px-6 py-3.5">Status</th>
+                            <th class="px-6 py-3.5 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="csTableBody" class="divide-y divide-slate-800/60">
+                        <!-- Data akan dimasukkan secara otomatis lewat JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', loadCsReports);
+        
+        // Cegah XSS: data tiket berasal dari input pengguna.
+        function esc(value) {
+            return String(value ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+        }
+        
+        function loadCsReports() {
+            const reports = JSON.parse(localStorage.getItem('rexstore_cs_tickets') || '[]');
+            const tbody = document.getElementById('csTableBody');
+            
+            document.getElementById('totalTickets').textContent = reports.length;
+            document.getElementById('pendingTickets').textContent = reports.filter(r => r.status === 'Pending').length;
+            document.getElementById('doneTickets').textContent = reports.filter(r => r.status === 'Selesai').length;
+            
+            if (reports.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-8 text-center text-slate-500">
+                            Belum ada laporan CS yang masuk.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = reports.map((item, index) => `
+                <tr class="hover:bg-slate-800/30 transition">
+                    <td class="px-6 py-4 whitespace-nowrap text-slate-400">${esc(item.time)}</td>
+                    <td class="px-6 py-4 font-semibold text-white whitespace-nowrap">${esc(item.name)}</td>
+                    <td class="px-6 py-4 font-mono text-cyan-400 whitespace-nowrap">${esc(item.orderId)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${esc(item.email)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${item.status === 'Selesai' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}">
+                            ${item.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-right space-x-2 whitespace-nowrap">
+                        <button onclick="toggleStatus(${index})" class="px-3 py-1.5 rounded-lg bg-cyan-600/20 text-cyan-400 hover:bg-cyan-600/30 font-semibold transition cursor-pointer">
+                            ${item.status === 'Pending' ? 'Tandai Selesai' : 'Ubah Pending'}
+                        </button>
+                        <button onclick="deleteReport(${index})" class="px-2.5 py-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition cursor-pointer">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function toggleStatus(index) {
+            let reports = JSON.parse(localStorage.getItem('rexstore_cs_tickets') || '[]');
+            reports[index].status = reports[index].status === 'Pending' ? 'Selesai' : 'Pending';
+            localStorage.setItem('rexstore_cs_tickets', JSON.stringify(reports));
+            loadCsReports();
+        }
+        
+        function deleteReport(index) {
+            let reports = JSON.parse(localStorage.getItem('rexstore_cs_tickets') || '[]');
+            reports.splice(index, 1);
+            localStorage.setItem('rexstore_cs_tickets', JSON.stringify(reports));
+            loadCsReports();
+        }
+        
+        function clearAllReports() {
+            if (confirm('Apakah Anda yakin ingin menghapus semua tiket CS?')) {
+                localStorage.removeItem('rexstore_cs_tickets');
+                loadCsReports();
+            }
+        }
+    </script>
+</body>
+</html>

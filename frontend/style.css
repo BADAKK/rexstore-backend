@@ -1,0 +1,227 @@
+body {
+    background-color: #090e17;
+    color: #f8fafc;
+    overflow-x: hidden;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.glass-panel {
+    background: rgba(22, 34, 56, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.03);
+}
+
+.item-selected {
+    border-color: #06b6d4 !important;
+    background-color: rgba(6, 182, 212, 0.12) !important;
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.35), 0 0 15px rgba(16, 185, 129, 0.2);
+}
+
+/* Transisi Khusus Modal & Backdrop (Presisi di Tengah Tanpa Geser Berbayang) */
+.modal {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal.active {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+}
+
+.modal-content {
+    transform: translateY(-20px) scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal.active .modal-content {
+    transform: translateY(0) scale(1);
+}
+
+.liquid-shape {
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+    animation: morph 8s ease-in-out infinite both alternate;
+}
+
+@keyframes morph {
+
+    0%,
+    100% {
+        border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+    }
+    
+    34% {
+        border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%;
+    }
+    
+    67% {
+        border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%;
+    }
+}
+
+.glass-overlay-banner {
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.15), 0 0 25px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.preserve-3d {
+    transform-style: preserve-3d;
+}
+
+.transform-z-30 {
+    transform: translateZ(30px);
+}
+
+.transform-z-60 {
+    transform: translateZ(60px);
+}
+
+.white-glow {
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.4), 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+/* Pastikan track dan slide konsisten selebar 100% */
+#slider-track {
+    display: flex;
+    width: 100%;
+    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#slider-track>div {
+    flex: 0 0 100%;
+    width: 100%;
+}
+
+/* Animasi masuk teks transaksi live */
+@keyframes tickerFade {
+    0% {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ticker-animate {
+    animation: tickerFade 0.4s ease-out forwards;
+}
+
+/* Styling indikator pilihan kartu dengan gradasi dominan Cyan & sentuhan Hijau */
+.denom-card.item-selected {
+    border-color: #06b6d4 !important;
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(16, 185, 129, 0.08));
+}
+
+.denom-card.item-selected .radio-indicator {
+    border-color: #06b6d4;
+    background: linear-gradient(135deg, #06b6d4, #10b981);
+}
+
+.denom-card.item-selected .check-dot {
+    display: block !important;
+    background: #0f172a;
+}
+
+/* Styling indikator pilihan metode pembayaran */
+.pm-card.item-selected {
+    border-color: #06b6d4 !important;
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(16, 185, 129, 0.08));
+}
+
+.pm-card.item-selected .radio-indicator {
+    border-color: #06b6d4;
+    background: linear-gradient(135deg, #06b6d4, #10b981);
+}
+
+.pm-card.item-selected .check-dot {
+    display: block !important;
+    background: #0f172a;
+}
+
+/* Transisi Halus untuk Elemen Interaktif & Tombol */
+button,
+input,
+.glass-panel,
+.denom-card,
+.pm-card,
+a {
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Animasi Fade In untuk Tampilan Halaman & View */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+#modal-overlay {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+#modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Container Utama Perspektif 3D Banner */
+#banner-container {
+    perspective: 1400px;
+    overflow: visible;
+}
+
+#banner-slider-wrapper {
+    display: flex;
+    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-style: preserve-3d;
+}
+
+.banner-slide-item {
+    min-width: 100%;
+    transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    backface-visibility: hidden;
+}
+
+#eyeIconLogin,
+#eyeIconReg {
+    transition: transform 0.2s ease, opacity 0.2s ease, color 0.2s ease;
+}
+
+/* Dipakai di index.html (tab nominal & modal petunjuk) tapi sebelumnya tidak pernah didefinisikan */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
