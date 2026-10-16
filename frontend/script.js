@@ -743,7 +743,8 @@ function renderGameGridCards(containerId, list) {
     container.innerHTML = list.map(g => `
         <div onclick="openTopUp('${g.id}')" class="group glass-panel rounded-xl p-3 hover:border-cyan-400/80 transition-all duration-300 cursor-pointer flex flex-col items-center text-center hover:-translate-y-1 shadow-md hover:shadow-[0_0_25px_rgba(6,182,212,0.3)]">
             <div class="w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden mb-2.5 shadow-inner border border-slate-700 group-hover:scale-105 transition-transform relative">
-                <img src="${g.image}" alt="${g.name}" class="w-full h-full object-cover">
+                <img src="${g.image}" alt="${g.name}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden')">
+                <div class="hidden w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-950 text-cyan-300 font-black text-sm" aria-hidden="true">${g.id === 'google-play' ? 'GP' : g.id === 'steam' ? 'ST' : g.name.slice(0, 2).toUpperCase()}</div>
             </div>
             <h3 class="font-bold text-white text-xs md:text-sm line-clamp-2 group-hover:text-cyan-300 transition">${g.name}</h3>
             <p class="text-[10px] md:text-xs text-slate-400 mt-0.5">${g.publisher}</p>
@@ -1110,7 +1111,7 @@ function renderTopUpForm() {
                     <div class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-110 transition-transform">
                         <img src="${imageSrc}" 
                              alt="Item" 
-                             onerror="this.onerror=null; this.src='../public/images/logo-item-game/diamond.png';" 
+                             onerror="this.onerror=null; this.src='../public/images/logo-item-game/Mobile-Legends/diamond.png';" 
                              class="w-full h-full object-contain">
                     </div>
                     <div class="flex-1 min-w-0">

@@ -241,6 +241,11 @@ if (fs.existsSync(frontendDir)) {
 }
 
 app.get('*', (req, res, next) => {
+    // Jangan mengembalikan index.html untuk file gambar/CSS/JS yang tidak ada.
+    // Itu membuat browser menerima HTML berstatus 200 seolah-olah asetnya berhasil.
+    if (path.extname(req.path)) {
+        return res.status(404).type('text/plain').send('Not Found');
+    }
     res.sendFile(path.join(frontendDir, 'index.html'), (error) => {
         if (error) next(error);
     });
